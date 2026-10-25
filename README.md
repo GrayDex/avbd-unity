@@ -49,7 +49,8 @@ Point masses (`Solver.AddPoint`) have 3 degrees of freedom: joints and springs h
 zero), angular rows and limits on them are refused, and they collide with nothing.
 
 Single-threaded like the demo: the whole step is one Burst job. Collisions between boxes only. Planned: capsules against
-triangles of weighted point masses, parallel solve by graph colouring.
+point masses with a radius (spheres), parallel solve by graph colouring. Capsules against surfaces of weighted point
+masses are on the `surface-touch` branch, with a known issue.
 
 ## License
 
