@@ -1,0 +1,5 @@
+root = false
+
+[*.cs]
+# Embedded under a project, the package path would join every namespace; the asmdef root namespace is the intended one.
+resharper_check_namespace_highlighting = none

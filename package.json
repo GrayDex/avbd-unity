@@ -1,0 +1,18 @@
+{
+  "name": "io.github.graydex.avbd",
+  "displayName": "AVBD Physics",
+  "version": "0.1.0",
+  "unity": "6000.0",
+  "description": "Augmented Vertex Block Descent (Giles, Diaz, Yuksel 2025) for Unity: rigid bodies, joints, springs and frictional contacts in one primal-dual solver, Burst-compiled. A port of the authors' avbd-demo3d.",
+  "keywords": ["physics", "avbd", "vbd", "rigid body", "solver"],
+  "license": "MIT",
+  "author": { "name": "GrayDex", "url": "https://github.com/GrayDex" },
+  "dependencies": {
+    "com.unity.burst": "1.8.25",
+    "com.unity.collections": "2.4.3",
+    "com.unity.mathematics": "1.3.2"
+  },
+  "samples": [
+    { "displayName": "Demo scenes", "description": "The 14 scenes of avbd-demo3d built from components, with a scene picker and mouse drag.", "path": "Samples~/Demo" }
+  ]
+}

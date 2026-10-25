@@ -1,0 +1,6 @@
+{
+  "name": "Avbd.Samples",
+  "rootNamespace": "Avbd.Samples",
+  "references": ["Avbd", "Unity.Mathematics"],
+  "autoReferenced": false
+}

@@ -1,0 +1,10 @@
+{
+  "name": "Avbd.Tests.Editor",
+  "rootNamespace": "Avbd.Tests",
+  "references": ["Avbd", "Unity.Mathematics", "Unity.Collections", "UnityEngine.TestRunner", "UnityEditor.TestRunner"],
+  "includePlatforms": ["Editor"],
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"]
+}

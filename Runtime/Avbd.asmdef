@@ -1,0 +1,8 @@
+{
+  "name": "Avbd",
+  "rootNamespace": "Avbd",
+  "references": ["Unity.Burst", "Unity.Collections", "Unity.Mathematics"],
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "noEngineReferences": false
+}
