@@ -19,8 +19,8 @@ Requires Unity 6, Burst, Collections, Mathematics. Samples → *Demo scenes* imp
 
 ## Use
 
-Components: put an `AvbdWorld` on a root object and `AvbdBody` (a box; density 0 is static and follows its transform)
-on its children. `AvbdJoint` links a body to another or to a world point; `AvbdSpring` is a linear spring.
+Components: put an `AvbdWorld` on a root object and `AvbdBody` (a box or a point mass; density, or mass for a point,
+0 is static and follows its transform) on its children. `AvbdJoint` links a body to another or to a world point; `AvbdSpring` is a linear spring.
 The world steps in `FixedUpdate` and writes the transforms back.
 
 Or the solver directly:
@@ -45,7 +45,10 @@ the swings for a hinge. `Tests/Editor/LimitTests` checks a pendulum against them
 
 ## Status
 
-Single-threaded like the demo: the whole step is one Burst job. Boxes only. Planned: point masses, capsules against
+Point masses (`Solver.AddPoint`) have 3 degrees of freedom: joints and springs hold them at their position (anchor
+zero), angular rows and limits on them are refused, and they collide with nothing.
+
+Single-threaded like the demo: the whole step is one Burst job. Collisions between boxes only. Planned: capsules against
 triangles of weighted point masses, parallel solve by graph colouring.
 
 ## License

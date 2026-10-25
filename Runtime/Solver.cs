@@ -71,6 +71,17 @@ namespace Avbd
             return body.Id;
         }
 
+        // A point mass: joints and springs hold it by its position (its anchor is zero), so a joint glues it
+        // to the other anchor. It has no rotation and collides with nothing.
+        public int AddPoint(float mass, float3 position, float3 velocity = default)
+        {
+            var body = Body.Point(mass, position, velocity);
+            body.Id = _nextBody++;
+            _index.Add(_bodies.Length);
+            _bodies.Add(body);
+            return body.Id;
+        }
+
         public ref Body Get(int id) => ref _bodies.ElementAt(IndexOf(id));
 
         public bool Contains(int body) => Find(body) >= 0;
@@ -100,6 +111,9 @@ namespace Avbd
         {
             var a = bodyA >= 0 ? IndexOf(bodyA) : -1;
             var b = IndexOf(bodyB);
+            if (stiffnessAng != 0f && (Pointed(a) || Pointed(b))) throw new ArgumentException("a point mass has no rotation to hold");
+            Unanchored(a, rA);
+            Unanchored(b, rB);
             var arm = (a >= 0 ? _bodies[a].Size : float3.zero) + _bodies[b].Size;
             return Link(new Force
             {
@@ -115,6 +129,7 @@ namespace Avbd
         {
             ref var force = ref GetForce(joint);
             if (force.Kind != ForceKind.Joint) throw new ArgumentException($"force {joint} is not a joint");
+            if (Pointed(force.A) || Pointed(force.B)) throw new ArgumentException("a point mass has no rotation to limit");
             force.FrameA = frameA;
             force.FrameB = frameB;
             force.Lower = lower;
@@ -127,6 +142,8 @@ namespace Avbd
         {
             var a = IndexOf(bodyA);
             var b = IndexOf(bodyB);
+            Unanchored(a, rA);
+            Unanchored(b, rB);
             if (rest < 0f)
                 rest = Derive.Distance(_bodies[a].Position, _bodies[a].Rotation, rA, _bodies[b].Position, _bodies[b].Rotation, rB);
             return Link(new Force { Kind = ForceKind.Spring, A = a, B = b, AnchorA = rA, AnchorB = rB, StiffnessLin = stiffness, Rest = rest });
@@ -160,7 +177,7 @@ namespace Avbd
             local = float3.zero;
             foreach (var body in _bodies)
             {
-                if (body.Mass <= 0f) continue;
+                if (body.Mass <= 0f || body.Shape != BodyShape.Box) continue;
                 var inverse = Maths.Conjugate(body.Rotation);
                 var o = Maths.Rotate(inverse, origin - body.Position);
                 var d = Maths.Rotate(inverse, direction);
@@ -203,6 +220,13 @@ namespace Avbd
             force.Id = _nextForce++;
             Job.Link(force);
             return force.Id;
+        }
+
+        private bool Pointed(int index) => index >= 0 && _bodies[index].Shape == BodyShape.Point;
+
+        private void Unanchored(int index, float3 anchor)
+        {
+            if (Pointed(index) && math.any(anchor != float3.zero)) throw new ArgumentException("a point mass is held at its position: anchor it at zero");
         }
 
         private int Find(int id) => id >= 0 && id < _index.Length ? _index[id] : -1;

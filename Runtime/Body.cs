@@ -2,10 +2,17 @@ using Unity.Mathematics;
 
 namespace Avbd
 {
-    // A rigid box. Mass 0 is static or kinematic: the solver moves it only if you do.
+    public enum BodyShape : byte
+    {
+        Box,
+        Point // a point mass: position only, no rotation, no collisions
+    }
+
+    // A rigid box or a point mass. Mass 0 is static or kinematic: the solver moves it only if you do.
     public struct Body
     {
         public int Id;
+        public BodyShape Shape;
         public float3 Position;
         public quaternion Rotation;
         public float3 Velocity;
@@ -30,5 +37,11 @@ namespace Avbd
                 Size = size, Mass = mass, Moment = moment, Friction = friction, Radius = radius
             };
         }
+
+        public static Body Point(float mass, float3 position, float3 velocity) => new()
+        {
+            Shape = BodyShape.Point, Position = position, Rotation = quaternion.identity, Velocity = velocity,
+            PreviousVelocity = velocity, Mass = mass
+        };
     }
 }

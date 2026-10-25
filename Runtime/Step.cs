@@ -88,6 +88,7 @@ namespace Avbd
             for (var a = Bodies.Length - 1; a >= 0; a--)
             for (var b = a - 1; b >= 0; b--)
             {
+                if (Bodies[a].Shape != BodyShape.Box || Bodies[b].Shape != BodyShape.Box) continue;
                 var dp = Bodies[a].Position - Bodies[b].Position;
                 var r = Bodies[a].Radius + Bodies[b].Radius;
                 if (math.dot(dp, dp) > r * r || Pairs.ContainsKey(Pair(Bodies[a].Id, Bodies[b].Id))) continue;
@@ -130,8 +131,14 @@ namespace Avbd
                 }
             }
 
-            Maths.Solve(lhs.Lin, lhs.Ang, lhs.Cross, -rhsLin, -rhsAng, out var dxLin, out var dxAng);
             ref var moved = ref Bodies.ElementAt(i);
+            if (body.Shape == BodyShape.Point)
+            {
+                moved.Position += math.mul(math.inverse(lhs.Lin), -rhsLin); // 3×3 block: forces' angular rows fall away
+                return;
+            }
+
+            Maths.Solve(lhs.Lin, lhs.Ang, lhs.Cross, -rhsLin, -rhsAng, out var dxLin, out var dxAng);
             moved.Position += dxLin;
             moved.Rotation = Maths.Add(moved.Rotation, dxAng);
         }
