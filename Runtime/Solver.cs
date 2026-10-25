@@ -108,6 +108,20 @@ namespace Avbd
             });
         }
 
+        // Angle limits, radians, of B's joint frame from A's: twist about x, then swing about y and z. Frames are
+        // the joint axes in each body's space (in the world for a world pin). Lower = upper locks an axis, infinite
+        // bounds free it. The joint's angular stiffness then pulls toward the frames' rest instead of equal rotations.
+        public void LimitJoint(int joint, quaternion frameA, quaternion frameB, float3 lower, float3 upper)
+        {
+            ref var force = ref GetForce(joint);
+            if (force.Kind != ForceKind.Joint) throw new ArgumentException($"force {joint} is not a joint");
+            force.FrameA = frameA;
+            force.FrameB = frameB;
+            force.Lower = lower;
+            force.Upper = upper;
+            force.Framed = true;
+        }
+
         // A negative rest length takes the current distance between the anchors.
         public int AddSpring(int bodyA, int bodyB, float3 rA, float3 rB, float stiffness, float rest = -1f)
         {

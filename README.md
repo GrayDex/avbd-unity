@@ -37,10 +37,16 @@ var pose = solver.Get(box).Position;
 Joint stiffness: infinite is a hard row, zero a free one — linear ∞ and angular 0 is a ball joint, both ∞ a weld,
 finite values make springs. A fracture torque breaks the joint.
 
+Angle limits (`Solver.LimitJoint`, or the *Angle limits* fields of `AvbdJoint`, laid out as in `ConfigurableJoint`):
+the joint frame's relative rotation splits into twist about x, then swing about y and z, as in PhysX D6. Each axis is
+free, limited to [lower, upper] or locked; a bound is a hard row whose force is clamped to one side (paper §3.2,
+stiffness rescaling of Eq. 14). Twist limits alone leave a ball joint free to swing round past them — lock or limit
+the swings for a hinge. `Tests/Editor/LimitTests` checks a pendulum against them.
+
 ## Status
 
-Single-threaded like the demo: the whole step is one Burst job. Boxes only. Planned: angle limits on joints,
-spheres and capsules, point masses, parallel solve by graph colouring.
+Single-threaded like the demo: the whole step is one Burst job. Boxes only. Planned: point masses, capsules against
+triangles of weighted point masses, parallel solve by graph colouring.
 
 ## License
 

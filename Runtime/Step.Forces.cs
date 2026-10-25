@@ -13,8 +13,13 @@ namespace Avbd
             (joint.A >= 0 ? Maths.Transform(Bodies[joint.A].Position, Bodies[joint.A].Rotation, joint.AnchorA) : joint.AnchorA)
             - Maths.Transform(Bodies[joint.B].Position, Bodies[joint.B].Rotation, joint.AnchorB);
 
-        private float3 JointAngle(in Force joint) =>
-            Maths.Difference(joint.A >= 0 ? Bodies[joint.A].Rotation : quaternion.identity, Bodies[joint.B].Rotation) * joint.TorqueArm;
+        private float3 JointAngle(in Force joint)
+        {
+            var a = joint.A >= 0 ? Bodies[joint.A].Rotation : quaternion.identity;
+            var b = Bodies[joint.B].Rotation;
+            if (joint.Framed) (a, b) = (Maths.Mul(a, joint.FrameA), Maths.Mul(b, joint.FrameB));
+            return Maths.Difference(a, b) * joint.TorqueArm;
+        }
 
         private bool JointInitialize(ref Force joint)
         {
@@ -26,6 +31,7 @@ namespace Avbd
             joint.PenaltyAng = Maths.Clamp(joint.PenaltyAng * S.Gamma, Maths.PenaltyMin, Maths.PenaltyMax);
             joint.PenaltyLin = Maths.Min(joint.PenaltyLin, joint.StiffnessLin);
             joint.PenaltyAng = Maths.Min(joint.PenaltyAng, joint.StiffnessAng);
+            if (joint.Framed) LimitInitialize(ref joint);
             return !joint.Broken;
         }
 
@@ -63,6 +69,8 @@ namespace Avbd
                 lhs.Ang += math.mul(math.mul(jAngT, k), jAng);
                 rhsAng += math.mul(jAngT, f);
             }
+
+            if (joint.Framed) LimitPrimal(joint, isA, ref lhs, ref rhsAng);
         }
 
         private void JointDual(ref Force joint)
@@ -91,6 +99,7 @@ namespace Avbd
                 joint.PenaltyAng = Maths.Min(joint.PenaltyAng + math.abs(c) * S.BetaAng, math.min(joint.StiffnessAng, Maths.PenaltyMax));
             }
 
+            if (joint.Framed) LimitDual(ref joint);
             if (math.lengthsq(joint.LambdaAng) <= joint.Fracture * joint.Fracture) return;
             joint.PenaltyLin = joint.PenaltyAng = joint.LambdaLin = joint.LambdaAng = float3.zero;
             joint.Broken = true;

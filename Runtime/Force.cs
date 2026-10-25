@@ -25,6 +25,12 @@ namespace Avbd
         internal float TorqueArm;
         internal bool Broken;
 
+        // Joint angle limits (Solver.LimitJoint): joint axes in body space, bounds on twist x, swing y and z.
+        public quaternion FrameA, FrameB;
+        public float3 Lower, Upper;
+        internal bool Framed;
+        internal float3 C0Low, C0High, PenaltyLow, PenaltyHigh, LambdaLow, LambdaHigh;
+
         // Manifold: up to Manifold.Most contacts at Contacts[Block * Most ..].
         internal float3x3 Basis; // rows: normal from B to A, two tangents
         internal int Block, Count;
